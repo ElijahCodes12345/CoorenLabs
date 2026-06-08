@@ -3,12 +3,16 @@ import { animekaiRoutes } from "./animekai/route";
 import { animepaheRoutes } from "./animepahe/route";
 import { toonstreamRoutes } from "./toonstream/route";
 import { animesaltRoutes } from "./animesalt/route";
+import { animesaturnRoutes } from "./animesaturn/route";
+import { animeunityRoutes } from "./animeunity/route";
 
 export const animeRoutes = new Elysia({ prefix: "/anime" })
   .use(animepaheRoutes)
   .use(animekaiRoutes)
   .use(toonstreamRoutes)
   .use(animesaltRoutes)
+  .use(animesaturnRoutes)
+  .use(animeunityRoutes)
 
   // ─── Overview Endpoint ────────────────────────────────────────────────────────
   .get(
@@ -16,7 +20,7 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
     () => ({
       service: "anime",
       description: "Unified anime API — provider-isolated route architecture",
-      providers: ["animepahe", "animekai", "toonstream", "animesalt"],
+      providers: ["animepahe", "animekai", "toonstream", "animesalt", "animesaturn", "animeunity"],
       endpoints: {
         animepahe: [
           "GET /anime/animepahe/search/:query         → Search titles",
@@ -73,6 +77,16 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
           "GET /anime/animesalt/ts-segment?url=&headers=       → TS segment proxy",
           "GET /anime/animesalt/mp4-proxy?url=&headers=        → MP4 video proxy",
           "GET /anime/animesalt/fetch?url=&headers=            → Generic media fetch proxy",
+        ],
+        animesaturn: [
+          "GET /anime/animesaturn/search/:query                → Search titles",
+          "GET /anime/animesaturn/info/:id                     → Full anime info + episodes",
+          "GET /anime/animesaturn/watch/*                      → Stream sources (pass the full episode ID from info)",
+        ],
+        animeunity: [
+          "GET /anime/animeunity/search/:query                 → Search titles",
+          "GET /anime/animeunity/info/:id                      → Full anime info + episodes",
+          "GET /anime/animeunity/watch/*                       → Stream sources (format: animeId/epId)",
         ],
       },
     }),
