@@ -84,7 +84,7 @@ export class AnimeUnity {
     }
   }
 
-  static async streams(episodeId: string): Promise<any[]> {
+  static async streams(episodeId: string): Promise<any> {
     try {
       // episodeId format: "animeId/epId"
       const [animeId, epId] = episodeId.split("/");
