@@ -481,7 +481,7 @@ export class AnimeKai {
 
   // ─── Episode Servers ─────────────────────────────────────────────────────────
 
-static async fetchEpisodeServers(
+  static async fetchEpisodeServers(
     episodeId: string,
     subOrDub: "softsub" | "dub" | "hardsub" = "hardsub",
   ): Promise<AnimeKaiServer[]> {
@@ -500,29 +500,38 @@ static async fetchEpisodeServers(
       const $ = cheerio.load(serverHtml);
       const servers: AnimeKaiServer[] = [];
 
-      const targetGroups = subOrDub === "dub" 
-        ? [{ id: "dub", type: "dub" as const }] 
-        : [
-            { id: "sub", type: "hardsub" as const }, 
-            { id: "softsub", type: "softsub" as const }
-          ];
-      
+      const targetGroups =
+        subOrDub === "dub"
+          ? [{ id: "dub", type: "dub" as const }]
+          : [
+              { id: "sub", type: "hardsub" as const },
+              { id: "softsub", type: "softsub" as const },
+            ];
+
       for (const group of targetGroups) {
         const serverItems = $(`.server-items.lang-group[data-id="${group.id}"] .server`);
-        
+
         await Promise.all(
           serverItems.toArray().map(async (server) => {
             const lid = $(server).attr("data-lid");
             if (!lid) return;
 
             const viewToken = await MegaUp.generateToken(lid);
-            const viewRes = await fetch(`${this.baseUrl}/ajax/links/view?id=${lid}&_=${viewToken}`, {
-              headers: this.headers(),
-            });
+            const viewRes = await fetch(
+              `${this.baseUrl}/ajax/links/view?id=${lid}&_=${viewToken}`,
+              {
+                headers: this.headers(),
+              },
+            );
             const viewData = await viewRes.json();
             const decoded = await MegaUp.decodeIframeData(viewData.result);
 
-            const suffix = group.type === "hardsub" ? " (HardSub)" : group.type === "softsub" ? " (SoftSub)" : "";
+            const suffix =
+              group.type === "hardsub"
+                ? " (HardSub)"
+                : group.type === "softsub"
+                  ? " (SoftSub)"
+                  : "";
 
             servers.push({
               name: `megaup ${$(server).text().trim()}${suffix}`.toLowerCase(),
@@ -548,12 +557,12 @@ static async fetchEpisodeServers(
     }
   }
 
-// ─── Streams ─────────────────────────────────────────────────────────────────
+  // ─── Streams ─────────────────────────────────────────────────────────────────
 
   static async streams(
     animeId: string,
     episodeId: string,
-    type?: "softsub" | "dub" | "hardsub"
+    type?: "softsub" | "dub" | "hardsub",
   ): Promise<any> {
     try {
       const token = episodeId.split("$token=")[1];
@@ -572,11 +581,11 @@ static async fetchEpisodeServers(
       const seen = new Set<string>();
 
       const isDubRequest = type === "dub";
-      const targetGroups = isDubRequest 
-        ? [{ id: "dub", label: "dub", subType: null }] 
+      const targetGroups = isDubRequest
+        ? [{ id: "dub", label: "dub", subType: null }]
         : [
-            { id: "sub", label: "hardsub", subType: "hard" }, 
-            { id: "softsub", label: "softsub", subType: "soft" }
+            { id: "sub", label: "hardsub", subType: "hard" },
+            { id: "softsub", label: "softsub", subType: "soft" },
           ];
 
       // Track intro and outro globally so they only appear once
@@ -592,7 +601,11 @@ static async fetchEpisodeServers(
           seen.add(lid);
 
           const viewToken = await MegaUp.generateToken(lid);
-          const viewData = await (await fetch(`${this.baseUrl}/ajax/links/view?id=${lid}&_=${viewToken}`, { headers: this.headers() })).json();
+          const viewData = await (
+            await fetch(`${this.baseUrl}/ajax/links/view?id=${lid}&_=${viewToken}`, {
+              headers: this.headers(),
+            })
+          ).json();
 
           const decoded = await MegaUp.decodeIframeData(viewData.result);
           const videoSources = await MegaUp.extract(decoded.url);
@@ -605,20 +618,24 @@ static async fetchEpisodeServers(
 
           const formattedSubtitles = (videoSources.subtitles || []).map((sub: any) => ({
             ...sub,
-            type: group.subType || "none"
+            type: group.subType || "none",
           }));
 
-          const suffix = group.label === "hardsub" ? " (HardSub)" 
-                       : group.label === "softsub" ? " (SoftSub)" 
-                       : group.label === "dub" ? " (Dub)" 
-                       : "";
+          const suffix =
+            group.label === "hardsub"
+              ? " (HardSub)"
+              : group.label === "softsub"
+                ? " (SoftSub)"
+                : group.label === "dub"
+                  ? " (Dub)"
+                  : "";
 
           results.push({
             name: `MegaUp ${$(item).text().trim()}${suffix}`,
             iframe: decoded.url,
             sources: videoSources.sources,
             subtitles: formattedSubtitles,
-            download: videoSources.download
+            download: videoSources.download,
           });
         }
       }

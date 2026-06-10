@@ -49,8 +49,7 @@ export const flamecomicsRoutes = new Elysia({ prefix: "/flamecomics" })
       params: t.Object({
         mangaId: t.String({ description: "Series ID (numeric, e.g., 1)" }),
         token: t.String({
-          description:
-            "Chapter token from the detail endpoint chapters list (e.g., chapter-1)",
+          description: "Chapter token from the detail endpoint chapters list (e.g., chapter-1)",
         }),
       }),
       detail: {

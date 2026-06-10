@@ -62,18 +62,16 @@ export class MangaPillParser {
 
   async getChapterImages(chapterId: string): Promise<any> {
     try {
-      const response = await fetcher(
-        `${BASE_URL}/chapters/${chapterId}`,
-        false,
-        "mangapill",
-      );
+      const response = await fetcher(`${BASE_URL}/chapters/${chapterId}`, false, "mangapill");
       if (!response || !response.success) throw new Error("Failed to get chapter");
 
       const $ = cheerio.load(response.text);
 
       const chapterTitle = $(".container.mb-3 h1").text().trim();
-      const prevUrl = $(".container .flex.items-center.gap-2 a[data-hotkey='ArrowLeft']").attr("href") || null;
-      const nextUrl = $(".container .flex.items-center.gap-2 a[data-hotkey='ArrowRight']").attr("href") || null;
+      const prevUrl =
+        $(".container .flex.items-center.gap-2 a[data-hotkey='ArrowLeft']").attr("href") || null;
+      const nextUrl =
+        $(".container .flex.items-center.gap-2 a[data-hotkey='ArrowRight']").attr("href") || null;
 
       const pages: string[] = [];
       $("chapter-page").each((_, el) => {

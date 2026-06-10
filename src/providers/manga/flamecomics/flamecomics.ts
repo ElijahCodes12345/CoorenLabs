@@ -123,8 +123,12 @@ export class FlameComicsParser {
         token: chapter.token,
         release_date: chapter.release_date,
         images,
-        prevChapter: prevToken ? `${BASE_URL}/series/${chapter.series_id || mangaId}/${prevToken}` : null,
-        nextChapter: nextToken ? `${BASE_URL}/series/${chapter.series_id || mangaId}/${nextToken}` : null,
+        prevChapter: prevToken
+          ? `${BASE_URL}/series/${chapter.series_id || mangaId}/${prevToken}`
+          : null,
+        nextChapter: nextToken
+          ? `${BASE_URL}/series/${chapter.series_id || mangaId}/${nextToken}`
+          : null,
         prevToken,
         nextToken,
       };
