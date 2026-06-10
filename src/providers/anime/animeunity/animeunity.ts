@@ -108,10 +108,12 @@ export class AnimeUnity {
       const playerRes = await fetch(embedUrl, { headers: { ...this.headers(), Referer: url } });
       const playerHtml = await playerRes.text();
 
-      const results: any[] = [];
+      const streams: any[] = [];
+      const downloads: any[] = [];
       const domainMatch = playerHtml.match(/url: '(.*)'/);
       const tokenMatch = playerHtml.match(/token': '(.*)'/);
       const expiresMatch = playerHtml.match(/expires': '(.*)'/);
+      const downloadMatch = playerHtml.match(/window\.downloadUrl\s*=\s*['"](.*?)['"]/);
 
       if (domainMatch && tokenMatch && expiresMatch) {
         const domain = domainMatch[1];
@@ -119,17 +121,34 @@ export class AnimeUnity {
         const expires = expiresMatch[1];
         const streamUrl = `${domain}${domain.includes("?") ? "&" : "?"}token=${token}&referer=&expires=${expires}&h=1`;
 
-        results.push({
+        streams.push({
           url: streamUrl,
-          quality: "default",
+          quality: "auto",
           isM3U8: true,
         });
       }
 
-      return results;
+      if (downloadMatch) {
+        downloads.push({
+          url: downloadMatch[1],
+          quality: "1080p",
+        });
+      }
+
+      const response: any = {
+        streams,
+      };
+
+      if (downloads.length > 0) {
+        response.downloads = downloads;
+      }
+
+      return {
+        results: response,
+      };
     } catch (err) {
       Logger.error(`AnimeUnity streams error: ${String(err)}`);
-      return [];
+      return { results: { streams: [] } };
     }
   }
 }

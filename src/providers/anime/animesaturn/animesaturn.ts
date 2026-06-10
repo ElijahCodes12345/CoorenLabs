@@ -65,19 +65,28 @@ export class AnimeSaturn {
       const html = await res.text();
       const $ = cheerio.load(html);
 
-      const title = $("title")
-        .text()
-        .replace("Streaming SUB ITA e ITA", "")
-        .replace("AnimeSaturn - ", "")
-        .trim();
-      const image = $("img.img-fluid").attr("src") || "";
-      const description = $(".card-body").first().text().trim(); // Needs better selector
+      const title = $("title").text().split("Streaming")[0].replace("AnimeSaturn - ", "").trim();
+      const image =
+        $("img.img-fluid").attr("src") || $('meta[property="og:image"]').attr("content") || "";
+      const description =
+        $("#full-trama").text().trim() ||
+        $("#shown-trama").text().trim() ||
+        $(".card-body").first().text().trim();
 
       const genres: string[] = [];
-      $(".badge-dark").each((_, el) => {
+      $(".generi-as").each((_, el) => {
         const text = $(el).text().trim();
-        if (text && !text.includes("Episodi")) genres.push(text);
+        if (text) genres.push(text);
       });
+
+      const status =
+        $("b")
+          .filter((_, el) => $(el).text().includes("Stato:"))
+          .parent()
+          .text()
+          .split("Stato:")[1]
+          ?.split("\n")[0]
+          ?.trim() || "";
 
       const episodes: AnimeSaturnEpisode[] = [];
       $(".bottone-ep").each((_, element) => {
@@ -100,6 +109,7 @@ export class AnimeSaturn {
         image,
         description,
         genres,
+        status,
         totalEpisodes: episodes.length,
         episodes,
       };
@@ -109,7 +119,9 @@ export class AnimeSaturn {
     }
   }
 
-  static async streams(episodeId: string): Promise<any[]> {
+  static async streams(
+    episodeId: string,
+  ): Promise<{ results: { streams: any[]; downloads?: any[] } }> {
     try {
       const actualEpId = episodeId.split("/").pop() || episodeId;
       const url = `${this.baseUrl}/ep/${actualEpId}`;
@@ -118,13 +130,14 @@ export class AnimeSaturn {
       const $ = cheerio.load(html);
 
       const watchUrl = $('a:contains("Guarda lo streaming")').attr("href");
-      if (!watchUrl) return [];
+      if (!watchUrl) return { results: { streams: [] } };
 
       const watchRes = await fetch(watchUrl, { headers: this.headers() });
       const watchHtml = await watchRes.text();
       const $watch = cheerio.load(watchHtml);
 
-      const results: any[] = [];
+      const streams: any[] = [];
+      const downloads: any[] = [];
 
       // Look for sources in scripts or video tags
       const scripts = $watch("script").toArray();
@@ -133,18 +146,18 @@ export class AnimeSaturn {
 
         const m3u8Match = content.match(/file:\s*["'](https?:\/\/.+?\.m3u8.*?)["']/);
         if (m3u8Match) {
-          results.push({
+          streams.push({
             url: m3u8Match[1],
-            quality: "default",
+            quality: "auto",
             isM3U8: true,
           });
         }
 
         const mp4Match = content.match(/file:\s*["'](https?:\/\/.+?\.mp4.*?)["']/);
         if (mp4Match) {
-          results.push({
+          streams.push({
             url: mp4Match[1],
-            quality: "default",
+            quality: "auto",
             isM3U8: false,
           });
         }
@@ -152,16 +165,26 @@ export class AnimeSaturn {
 
       // Check for external servers too
       $watch(".btn-server").each((_, el) => {
-        results.push({
+        streams.push({
           name: $(el).text().trim(),
           url: $(el).attr("href"),
         });
       });
 
-      return results;
+      const response: any = {
+        streams,
+      };
+
+      if (downloads.length > 0) {
+        response.downloads = downloads;
+      }
+
+      return {
+        results: response,
+      };
     } catch (err) {
       Logger.error(`AnimeSaturn streams error: ${String(err)}`);
-      return [];
+      return { results: { streams: [] } };
     }
   }
 }

@@ -2,6 +2,8 @@ import { Elysia, t } from "elysia";
 import { AnimeSaturn } from "./animesaturn";
 
 export const animesaturnRoutes = new Elysia({ prefix: "/animesaturn" })
+
+  // ─── Search ──────────────────────────────────────────────────────────────────
   .get(
     "/search/:query",
     async ({ params: { query }, query: qs }) => {
@@ -16,12 +18,12 @@ export const animesaturnRoutes = new Elysia({ prefix: "/animesaturn" })
         page: t.Optional(t.String({ description: "Page number" })),
       }),
       detail: {
-        tags: ["anime"],
-        summary: "AnimeSaturn Search",
-        description: "Search for anime titles on AnimeSaturn.",
+        description: "Search for anime titles on AnimeSaturn (Italian source).",
       },
     },
   )
+
+  // ─── Info ────────────────────────────────────────────────────────────────────
   .get(
     "/info/:id",
     async ({ params: { id }, set }) => {
@@ -37,12 +39,14 @@ export const animesaturnRoutes = new Elysia({ prefix: "/animesaturn" })
         id: t.String({ description: "The anime ID (e.g., One-Piece-Sub-ITA-a)" }),
       }),
       detail: {
-        tags: ["anime"],
-        summary: "AnimeSaturn Info",
-        description: "Fetch full anime information and episode list.",
+        description:
+          "Fetch full anime information and episode list from AnimeSaturn (Italian source).",
       },
     },
   )
+
+  // ─── Watch / Stream Sources ───────────────────────────────────────────────
+  // Accepts full composite ID (animeSlug/episodeSlug) or just the episode slug
   .get(
     "/watch/*",
     async ({ params, set }) => {
@@ -51,17 +55,12 @@ export const animesaturnRoutes = new Elysia({ prefix: "/animesaturn" })
         set.status = 400;
         return { message: "episodeId is required" };
       }
-      const results = await AnimeSaturn.streams(episodeId);
-      return { results };
+      return await AnimeSaturn.streams(episodeId);
     },
     {
-      params: t.Object({
-        "*": t.String({ description: "Episode ID (e.g., One-Piece-Sub-ITA-a/One-Piece-ep-1 OR One-Piece-ep-1)" }),
-      }),
       detail: {
-        tags: ["anime"],
-        summary: "AnimeSaturn Watch",
-        description: "Fetch streaming sources for a specific AnimeSaturn episode. Supports full composite ID or just the episode ID.",
+        description:
+          "Fetch streaming sources for a specific AnimeSaturn episode (Italian source). Supports full composite ID or just the episode ID. Pass as /watch/{id}",
       },
     },
   );
