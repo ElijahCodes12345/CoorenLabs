@@ -103,29 +103,29 @@ export const animekaiRoutes = new Elysia({ prefix: "/animekai" })
     return res;
   })
 
-  // ─── Watch / Stream Sources ────────────────────────────────────────────────
+// ─── Watch / Stream Sources ────────────────────────────────────────────────
   .get("/watch/:episodeId", async ({ params: { episodeId }, query: qs, set }) => {
     if (!episodeId) {
       set.status = 400;
       return { message: "episodeId is required" };
     }
-
+    
     const type = qs?.type as "softsub" | "dub" | "hardsub" | undefined;
     const animeSlug = episodeId.split("$")[0] ?? episodeId;
-
+    
     // Return the response directly as it's already structured perfectly
     return await AnimeKai.streams(animeSlug, episodeId, type);
   })
 
   // ─── Episode Servers ───────────────────────────────────────────────────────
-  .get("/servers/:episodeId", async ({ params: { episodeId }, query: qs, set }) => {
-    if (!episodeId) {
-      set.status = 400;
-      return { message: "episodeId is required" };
-    }
+.get("/servers/:episodeId", async ({ params: { episodeId }, query: qs, set }) => {
+  if (!episodeId) {
+    set.status = 400;
+    return { message: "episodeId is required" };
+  }
 
-    const type = qs?.type as "softsub" | "dub" | "hardsub" | undefined;
-    return {
-      servers: await AnimeKai.fetchEpisodeServers(episodeId, type ?? "hardsub"),
-    };
-  });
+  const type = qs?.type as "softsub" | "dub" | "hardsub" | undefined;
+  return { 
+    servers: await AnimeKai.fetchEpisodeServers(episodeId, type ?? "hardsub") 
+  };
+});
