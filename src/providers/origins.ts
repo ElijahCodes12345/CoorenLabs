@@ -18,3 +18,5 @@ export const mangaball = "https://mangaball.net";
 
 export const himovies = "https://himovies.to";
 export const tidal = "https://api.tidal.com/v1";
+
+export const miruro = "https://www.miruro.to";

@@ -4,6 +4,7 @@ import { animepaheRoutes } from "./animepahe/route";
 import { toonstreamRoutes } from "./toonstream/route";
 import { animesaltRoutes } from "./animesalt/route";
 import { animelokAnimeRoutes } from "./animelok/route";
+import { miruroRoutes } from "./miruro/route";
 
 export const animeRoutes = new Elysia({ prefix: "/anime" })
   .use(animepaheRoutes)
@@ -11,6 +12,7 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
   .use(toonstreamRoutes)
   .use(animesaltRoutes)
   .use(animelokAnimeRoutes)
+  .use(miruroRoutes)
 
   // ─── Overview Endpoint ────────────────────────────────────────────────────────
   .get(
@@ -18,7 +20,7 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
     () => ({
       service: "anime",
       description: "Unified anime API — provider-isolated route architecture",
-      providers: ["animepahe", "animekai", "toonstream", "animesalt", "looker"],
+      providers: ["animepahe", "animekai", "toonstream", "animesalt", "looker", "miruro"],
       endpoints: {
         animepahe: [
           "GET /anime/animepahe/search/:query         → Search titles",
@@ -79,6 +81,23 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
         looker: [
           "GET /anime/animelok/episodes/:anilistId?title={title}&page={page}&lang={lang}&pageSize={pageSize}    → Episode list",
           "GET /anime/animelok/stream/:anilistId/:episode?title={title}&lang={lang}&quality={quality}           → Stream sources",
+        ],
+        miruro: [
+          "GET /anime/miruro/search/:query               → Search titles",
+          "GET /anime/miruro/suggestions/:query          → Lightweight search suggestions",
+          "GET /anime/miruro/filter                      → Advanced filter",
+          "GET /anime/miruro/spotlight                   → Spotlight anime",
+          "GET /anime/miruro/trending                    → Trending anime",
+          "GET /anime/miruro/popular                     → Popular anime",
+          "GET /anime/miruro/upcoming                    → Upcoming anime",
+          "GET /anime/miruro/recent                      → Recently updated/airing anime",
+          "GET /anime/miruro/schedule                    → Anime schedule",
+          "GET /anime/miruro/info/:id                    → Full anime info",
+          "GET /anime/miruro/characters/:id              → Anime characters",
+          "GET /anime/miruro/relations/:id               → Anime relations",
+          "GET /anime/miruro/recommendations/:id         → Anime recommendations",
+          "GET /anime/miruro/episodes/:id                → Anime episodes",
+          "GET /anime/miruro/watch/:provider/:anilistId/:category/:slug → Stream sources",
         ],
       },
     }),
