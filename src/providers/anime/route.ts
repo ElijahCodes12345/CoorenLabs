@@ -5,6 +5,7 @@ import { toonstreamRoutes } from "./toonstream/route";
 import { animesaltRoutes } from "./animesalt/route";
 import { animelokAnimeRoutes } from "./animelok/route";
 import { miruroRoutes } from "./miruro/route";
+import { anivexaRoutes } from "./anivexa/route";
 
 export const animeRoutes = new Elysia({ prefix: "/anime" })
   .use(animepaheRoutes)
@@ -13,6 +14,7 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
   .use(animesaltRoutes)
   .use(animelokAnimeRoutes)
   .use(miruroRoutes)
+  .use(anivexaRoutes)
 
   // ─── Overview Endpoint ────────────────────────────────────────────────────────
   .get(
@@ -20,7 +22,7 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
     () => ({
       service: "anime",
       description: "Unified anime API — provider-isolated route architecture",
-      providers: ["animepahe", "animekai", "toonstream", "animesalt", "looker", "miruro"],
+      providers: ["animepahe", "animekai", "toonstream", "animesalt", "looker", "miruro", "anivexa"],
       endpoints: {
         animepahe: [
           "GET /anime/animepahe/search/:query         → Search titles",
@@ -98,6 +100,17 @@ export const animeRoutes = new Elysia({ prefix: "/anime" })
           "GET /anime/miruro/recommendations/:id         → Anime recommendations",
           "GET /anime/miruro/episodes/:id                → Anime episodes",
           "GET /anime/miruro/watch/:provider/:anilistId/:category/:slug → Stream sources",
+        ],
+        anivexa: [
+          "GET /anime/anivexa/                                                  → Provider overview",
+          "GET /anime/anivexa/map/:anilistId                                    → Multi-DB ID mappings",
+          "GET /anime/anivexa/episodes/:anilistId                               → All-provider episodes",
+          "GET /anime/anivexa/episodes/:provider[/:provider...]/:anilistId      → Filtered episodes (?map=true|false)",
+          "GET /anime/anivexa/watch/:provider/:id/sub|dub/:provider-:ep         → Stream sources",
+          "GET /anime/anivexa/stream/reanime/:id/sub|dub/:ep                    → Reanime direct stream",
+          "GET /anime/anivexa/stream/2dhive/:id/sub|dub/:ep                     → 2dhive direct stream",
+          "GET /anime/anivexa/stream/2dhive/download/:id/sub|dub/:ep            → 2dhive download stream",
+          "GET /anime/anivexa/captcha/mkissa                                    → MKissa captcha helper",
         ],
       },
     }),

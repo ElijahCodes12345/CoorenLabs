@@ -58,6 +58,7 @@
     "string-similarity": "^4.0.4",
     "tmdb-ts": "^2.3.0",
     "tough-cookie": "^6.0.0",
+    "wreq-js": "^3.2.0",
     "zod": "^4.3.6"
   }
 }
